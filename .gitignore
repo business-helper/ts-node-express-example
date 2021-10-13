@@ -10,7 +10,7 @@ package-lock.json
 yarn.lock
 
 # build folder
-dist
+# dist
 
 # log file
 npm-debug.log
