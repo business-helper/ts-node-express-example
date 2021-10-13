@@ -9,5 +9,5 @@ var app = (0, express_1.default)();
 var routes_1 = __importDefault(require("./routes"));
 app.use('/', routes_1.default);
 app.listen(config_1.default.port, function () {
-    console.log("Timezones by location application is running on port " + config_1.default.port + ".");
+    console.log("Application is running on port " + config_1.default.port + ".");
 });

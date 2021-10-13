@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "npm run tsc",
-    "start": "node dest/index.js",
+    "start": "node ./dist/index.js",
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
