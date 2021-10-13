@@ -4,7 +4,7 @@ import config from './config';
 
 const app = express();
 
-import { default as indexRouter } from './routes';
+import indexRouter from './routes';
 
 app.use('/', indexRouter);
 
