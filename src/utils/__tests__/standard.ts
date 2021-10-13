@@ -1,7 +1,7 @@
 import {
   reverseWords,
   sortWords,
-} from '../index';
+} from '../starndard';
 
 type TestResultItem = {
   src: string;
