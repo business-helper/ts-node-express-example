@@ -4,37 +4,55 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var utils_1 = require("../utils");
+var node_input_validator_1 = require("node-input-validator");
+var errors_1 = require("../utils/errors");
+var common_1 = require("../utils/common");
+var starndard_1 = require("../utils/starndard");
 var tax_1 = require("../utils/tax");
 var router = express_1.default.Router();
 router.route("/reverse-words").get(function (req, res) {
-    var _a;
-    var sentence = (_a = req.query) === null || _a === void 0 ? void 0 : _a.sentence;
-    return Promise.resolve((0, utils_1.reverseWords)(sentence || ""))
-        .then(function (reversed) {
-        return res.set("Content-Type", "application/json").status(200).send(reversed);
+    var validator = new node_input_validator_1.Validator(req.query, {
+        sentence: "required|string|minLength:2",
+    });
+    return validator.check()
+        .then(function (matched) {
+        if (!matched)
+            throw new errors_1.ValidationError(validator.errors);
+        return (0, starndard_1.reverseWords)(req.query.sentence);
     })
-        .catch(function (error) { return res.status(400).send(error.message); });
+        .then(function (reversed) { return res.status(200).json(reversed); })
+        .catch(function (error) { return (0, common_1.__error)(res, error); });
 });
 router.route("/sort-words").get(function (req, res) {
-    var _a;
-    var sentence = (_a = req.query) === null || _a === void 0 ? void 0 : _a.sentence;
-    return Promise.resolve((0, utils_1.sortWords)(sentence || ""))
-        .then(function (sorted) {
-        return res.set("Content-Type", "application/json").status(200).send(sorted);
+    var validator = new node_input_validator_1.Validator(req.query, {
+        sentence: "required|string|minLength:2",
+    });
+    return validator.check()
+        .then(function (matched) {
+        if (!matched)
+            throw new errors_1.ValidationError(validator.errors);
+        return (0, starndard_1.sortWords)(req.query.sentence);
     })
-        .catch(function (error) { return res.status(400).send(error.message); });
+        .then(function (sorted) { return res.status(200).json(sorted); })
+        .catch(function (error) { return (0, common_1.__error)(res, error); });
 });
 router.route("/calculate-after-tax-income").get(function (req, res) {
+    var validator = new node_input_validator_1.Validator(req.query, {
+        annualBaseSalary: "required|numeric",
+    });
     var baseSalary = parseInt(req.query.annualBaseSalary, 10);
-    return Promise.all([
-        (0, tax_1.getIncomeTax)(baseSalary),
-        (0, tax_1.getMedicareTax)(baseSalary),
-        (0, tax_1.getSuperannuation)(baseSalary),
-    ])
+    return validator.check()
+        .then(function (matched) {
+        if (!matched)
+            throw new errors_1.ValidationError(validator.errors);
+        return Promise.all([
+            (0, tax_1.getIncomeTax)(baseSalary),
+            (0, tax_1.getMedicareTax)(baseSalary),
+            (0, tax_1.getSuperannuation)(baseSalary),
+        ]);
+    })
         .then(function (_a) {
         var incomeTax = _a[0], medicareTax = _a[1], superannuation = _a[2];
-        // const incomeTax = rounding(incomeTaxRate * baseSalary / 100);
         var totalTax = (0, tax_1.rounding)(incomeTax + medicareTax);
         return res
             .status(200)
@@ -49,11 +67,19 @@ router.route("/calculate-after-tax-income").get(function (req, res) {
             postTaxIncome: baseSalary - totalTax,
         });
     })
-        .catch();
+        .catch(function (error) { return (0, common_1.__error)(res, error); });
 });
 router.route("/calculate-pre-tax-income-from-take-home").get(function (req, res) {
+    var validator = new node_input_validator_1.Validator(req.query, {
+        postTaxSalary: "required|numeric",
+    });
     var postTaxSalary = parseInt(req.query.postTaxSalary, 10);
-    return Promise.resolve((0, tax_1.estimateBaseSalary)(postTaxSalary))
+    return validator.check()
+        .then(function (matched) {
+        if (!matched)
+            throw new errors_1.ValidationError(validator.errors);
+        return Promise.resolve((0, tax_1.estimateBaseSalary)(postTaxSalary));
+    })
         .then(function (baseSalary) {
         var incomeTax = (0, tax_1.getIncomeTax)(baseSalary);
         var medicareTax = (0, tax_1.getMedicareTax)(baseSalary);
@@ -72,9 +98,6 @@ router.route("/calculate-pre-tax-income-from-take-home").get(function (req, res)
             postTaxIncome: baseSalary - totalTax,
         });
     })
-        .catch(function (error) {
-        console.log('[Error]', error);
-        return res.json({ status: false, message: error.message });
-    });
+        .catch(function (error) { return (0, common_1.__error)(res, error); });
 });
 exports.default = router;

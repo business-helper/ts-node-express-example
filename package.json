@@ -7,6 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "npm run tsc",
     "start": "node ./dist/index.js",
+    "deploy:heroku": "npm run build & git push heroku master",
     "tsc": "tsc",
     "test": "jest"
   },
