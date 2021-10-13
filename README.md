@@ -30,6 +30,12 @@ The default port is 3000.
 npm run dev
 ```
 
+### Test
+
+```bash
+npm run test
+```
+
 ### Build 
 
 ```bash
