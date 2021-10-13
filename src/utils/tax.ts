@@ -8,7 +8,7 @@ export function rounding(src: number, pos: number = 0): number {
   const exp = Math.pow(10, pos);
   const temp = src * exp;
   const fraction = temp - Math.floor(temp);
-  return (fraction > threshold ? temp + 1 : temp) / exp;
+  return Math.floor(fraction > threshold ? temp + 1 : temp) / exp;
 }
 
 /**
@@ -48,4 +48,26 @@ export function getMedicareTax(income: number): number {
  */
 export function getSuperannuation(income: number): number {
   return rounding(income * 0.095, 2);
+}
+
+export function estimateBaseSalary(postTaxSalary: number): number {
+  let min = 0;
+  let max = postTaxSalary * 5;
+
+  let midPoint = Math.floor((min + max) / 2);
+  let nIter = 0;
+  while(max - min > 1) {
+    const incomeTax = getIncomeTax(midPoint);
+    const medicareTax = getMedicareTax(midPoint);
+    const totalTax = rounding(incomeTax + medicareTax);
+    const postTax = midPoint - totalTax;
+
+    if (postTax > postTaxSalary) {
+      max = midPoint;
+    } else {
+      min = midPoint;
+    }
+    midPoint = Math.floor((min + max) / 2);
+  }
+  return midPoint;
 }
