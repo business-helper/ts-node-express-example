@@ -9,5 +9,5 @@ import indexRouter from './routes';
 app.use('/', indexRouter);
 
 app.listen(config.port, () => {
-  console.log(`Application is running on port ${config.port}.`);
+  console.log(`The server is running on port ${config.port}.`);
 });
